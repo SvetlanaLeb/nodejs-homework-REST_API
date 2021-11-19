@@ -1,17 +1,21 @@
 import express from 'express'
-import ctrl from '../../controllers/contactController.js'
+import ContactsController from '../../controllers/contactController.js'
 import vld from '../../middlewares/validationMiddleware.js'
 
 const router = express.Router()
 
-router.get('/', ctrl.listContacts)
+router.get('/', ContactsController.listContacts)
 
-router.get('/:contactId', ctrl.getContactById)
+router.get('/:contactId', ContactsController.getContactById)
 
-router.post('/', vld.addPostValidation, ctrl.addContact)
+router.post('/', vld.addPostValidation, ContactsController.addContact)
 
-router.delete('/:contactId', ctrl.removeContact)
+router.delete('/:contactId', ContactsController.removeContact)
 
-router.patch('/:contactId', vld.patchPostValidation, ctrl.updateContact)
+router.patch(
+  '/:contactId',
+  vld.patchPostValidation,
+  ContactsController.updateContact
+)
 
 export default router

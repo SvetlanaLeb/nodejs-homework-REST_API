@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-constructor */
 
 import { HttpCodes } from '../constants.js'
-import db from '../db/contactsOptions/index.js'
+import db from '../model/contacts/index.js.js.js'
 
 class ContactsController {
   constructor() { }

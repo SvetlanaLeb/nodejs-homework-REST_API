@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-const validation = {
+const vld = {
   addPostValidation: (req, res, next) => {
     const schema = Joi.object({
       name: Joi.string().min(3).max(20).required(),
@@ -26,4 +26,4 @@ const validation = {
     next()
   },
 }
-export default validation
+export default vld
