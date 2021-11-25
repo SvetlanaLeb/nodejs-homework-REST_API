@@ -4,7 +4,7 @@ const vld = (schema) => {
   const validFunc = (req, res, next) => {
     const { error } = schema.validate(req.body)
     if (error) {
-      throw new ValidationError(error.message)
+      next(new ValidationError(JSON.stringify(error.details)))
     }
     next()
   }
