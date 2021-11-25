@@ -1,167 +1,89 @@
 /* eslint-disable no-useless-constructor */
 
 import { HttpCodes } from '../constants.js'
-import db from '../model/contacts/index.js.js.js'
+import ContactsService from '../services/contactsService.js'
+import { Contact } from '../models/index.js'
 
 class ContactsController {
   constructor() { }
-  static async listContacts (req, res) {
-    try {
-      const contacts = await db.listContactsDB()
-      res.json(({
-        success: true,
-        code: HttpCodes.OK,
-        data: {
-          contacts
-        },
-        message: 'Contacts found.',
-      }))
-    } catch (error) {
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: `Contacts not found. ${error.message}`,
-      })
-    }
+  static async listContactsCtrl (req, res) {
+    const contacts = await ContactsService.listContacts()
+    return res.json(({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        contacts
+      },
+      message: 'Contacts found.',
+    }))
   }
 
-  static async getContactById(req, res) {
+  static async getContactByIdCtrl(req, res) {
     const { contactId } = req.params
-    try {
-      const contact = await db.getContactByIdDB(contactId)
-      if (contact) {
-        return res.send({
-          success: true,
-          code: HttpCodes.OK,
-          data: {
-            contact,
-          },
-          message: `Contact with id ${contactId} found.`,
-        })
-      }
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: `Contact with id ${contactId} not found.`,
-      })
-    } catch (err) {
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: `Contact not found. ${err.message}`,
-      })
-    }
+    const contact = await ContactsService.getContactById(contactId)
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        contact,
+      },
+      message: `Contact with id ${contactId} found.`,
+    })
   }
 
-  static async removeContact(req, res) {
+  static async removeContactCtrl(req, res) {
     const { contactId } = req.params
-
-    try {
-      const contact = await db.removeContactDB(contactId)
-      if (contact) {
-        return res.send({
-          success: true,
-          code: HttpCodes.OK,
-          data: {
-            contact,
-          },
-          message: `Contact with id ${contactId} was removed.`,
-        })
-      }
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: `Contact with id ${contactId} not found.`,
-      })
-    } catch (err) {
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: 'Contact not found',
-      })
-    }
+    const contact = await ContactsService.removeContact(contactId)
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        contact,
+      },
+      message: `Contact with id ${contactId} was removed.`,
+    })
   }
 
-  static async addContact(req, res) {
+  static async addContactCtrl(req, res) {
     const { name } = req.body
-    try {
-      if (!name) {
-        return res.send({
-          success: false,
-          code: HttpCodes.BAD_REQUEST,
-          data: 'Invalid request',
-          message: 'Missing required name field',
-        })
-      }
-      const contact = await db.addContactDB(req.body)
-      if (contact) {
-        return res.send({
-          success: true,
-          code: HttpCodes.CREATED,
-          data: {
-            contact,
-          },
-          message: 'Created'
-        })
-      }
-      res.send({
-        success: false,
-        code: HttpCodes.BAD_REQUEST,
-        data: 'Invalid request',
-        message: `There is already a contact with the name ${name}`,
-      })
-    } catch (err) {
-      res.send({
-        success: false,
-        code: HttpCodes.BAD_REQUEST,
-        data: 'Invalid request',
-        message: `${err.message}`,
-      })
-    }
+    await ContactsService.getContactByName(name)
+    const contact = await Contact.create(req.body)
+    return res.send({
+      success: true,
+      code: HttpCodes.CREATED,
+      data: {
+        contact,
+      },
+      message: 'Created'
+    })
   }
 
-  static async updateContact(req, res) {
-    const { body } = req
+  static async updateContactCtrl(req, res) {
     const { contactId } = req.params
-    try {
-      const contact = await db.updateContactDB(contactId, body)
-      if (!contact) {
-        return res.send({
-          success: false,
-          code: HttpCodes.NOT_FOUND,
-          data: 'Not found',
-          message: `Contact with id ${contactId} not found.`,
-        })
-      }
-      if (JSON.stringify(body) === '{}') {
-        return res.send({
-          success: false,
-          code: HttpCodes.BAD_REQUEST,
-          data: 'Invalid request',
-          message: 'Missing fields.',
-        })
-      }
-      res.send({
-        success: true,
-        code: HttpCodes.OK,
-        data: {
-          contact,
-        },
-        message: `Contact with id ${contactId} was updated.`,
-      })
-    } catch (err) {
-      res.send({
-        success: false,
-        code: HttpCodes.NOT_FOUND,
-        data: 'Not found',
-        message: `Contact with id ${contactId} not found.`,
-      })
-    }
+    await ContactsService.getContactById(contactId)
+    const contact = await ContactsService.updateContact(contactId, req.body)
+
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        contact,
+      },
+      message: `Contact with id ${contactId} was updated.`,
+    })
+  }
+
+  static async updateContactStatusCtrl(req, res) {
+    const { contactId } = req.params
+    const contact = await ContactsService.updateContactStatus(contactId, req.body)
+    return res.send({
+      success: true,
+      code: HttpCodes.OK,
+      data: {
+        contact,
+      },
+      message: `Contact with id ${contactId} was updated.`,
+    })
   }
 }
 
