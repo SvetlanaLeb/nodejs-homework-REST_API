@@ -1,3 +1,7 @@
-import { Contact } from './Contact.js'
+const { Contact } = require('./contact')
+const { User } = require('./user')
 
-export { Contact }
+module.exports = {
+  Contact,
+  User
+}
