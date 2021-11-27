@@ -1,23 +1,19 @@
-import app from '../app.js'
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
+const app = require('../app')
+const mongoose = require('mongoose')
+require('dotenv').config()
 
-// import connectDB from '../config/db.js'
+const { DB_HOST, PORT = 3000 } = process.env
 
-dotenv.config()
-const { PORT, DB_URL, NODE_ENV } = process.env
-
-async function main() {
-  await mongoose.connect(DB_URL)
-  app.listen(PORT, () => {
-    console.log(`Server running. Use our API on port: ${PORT} in ${NODE_ENV} mode`.cyan.bold)
+mongoose.connect(DB_HOST, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log('Database connection successful')
+    })
   })
-}
-mongoose.connection.on('connected', () => {
-  console.log('Database connection successful!'.yellow.bold)
-})
-
-main().catch((err) => {
-  console.log(`Failed to connect to database! Error: ${err.message}`.red.bold)
-  process.exit(1)
-})
+  .catch(error => {
+    console.log(error)
+    process.exit(1)
+  })

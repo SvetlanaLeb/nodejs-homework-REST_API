@@ -1,36 +1,20 @@
-import express from 'express'
-import ContactsController from '../../controllers/contactController.js'
-import { vld } from '../../middlewares/index.js'
-import { asyncWrapper } from '../../helpers/index.js'
-import {
-  joiContactSchema,
-  joiFavoriteContactSchema,
-  joiPatchedContactSchema
-} from '../../models/Contact.js'
-
+const express = require('express')
 const router = express.Router()
 
-const addPostValidation = vld(joiContactSchema)
-const patchPostValidation = vld(joiPatchedContactSchema)
-const updateStatusValidation = vld(joiFavoriteContactSchema)
+const { joiContactSchema, updateFavoriteJoiSchema } = require('../../models/contact')
+const { controllerWrapper, validation} = require('../../middlewares')
+const { contacts: ctrl } = require('../../controllers')
 
-router.get('/', asyncWrapper(ContactsController.listContactsCtrl))
+router.get('/', controllerWrapper(ctrl.getList))
 
-router.get('/:contactId', asyncWrapper(ContactsController.getContactByIdCtrl))
+router.get('/:id', controllerWrapper(ctrl.getContactById))
 
-router.post('/', addPostValidation, asyncWrapper(ContactsController.addContactCtrl))
+router.post('/', validation(joiContactSchema), controllerWrapper(ctrl.addContact))
 
-router.delete('/:contactId', asyncWrapper(ContactsController.removeContactCtrl))
+router.put('/:id', validation(joiContactSchema), controllerWrapper(ctrl.updateContact))
 
-router.patch(
-  '/:contactId',
-  patchPostValidation,
-  asyncWrapper(ContactsController.updateContactCtrl)
-)
-router.patch(
-  '/:contactId/favorite',
-  updateStatusValidation,
-  asyncWrapper(ContactsController.updateContactStatusCtrl)
-)
+router.patch('/:id/favorite', validation(updateFavoriteJoiSchema), controllerWrapper(ctrl.updateStatusContact))
 
-export default router
+router.delete('/:id', controllerWrapper(ctrl.removeContact))
+
+module.exports = router;
