@@ -4,15 +4,30 @@ import { BadRequestError } from '../helpers/index.js'
 class ContactsService {
   // eslint-disable-next-line no-useless-constructor
   constructor() { }
-  static async listContacts () {
-    const contacts = await Contact.find({})
+  static async listContacts(owner, page, limit, favorite) {
+    const options = {
+      page,
+      limit
+    }
+    const contacts = await Contact.paginate({ owner }, options, function (err, result) {
+      if (err) { throw new BadRequestError(err.message) }
+      return result
+    })
+    if (favorite) {
+      const contacts = await Contact.aggregate([{
+        $match: {
+          favorite: true
+        }
+      }])
+      return contacts
+    }
     return contacts
   }
 
-  static async getContactById(id) {
-    const contact = await Contact.findById(id)
+  static async getContactById(_id, owner) {
+    const contact = await Contact.findOne({ _id, owner })
     if (!contact) {
-      throw new BadRequestError(`Contact with id ${id} not found.`)
+      throw new BadRequestError(`Contact with id ${_id} not found.`)
     }
     return contact
   }
@@ -24,16 +39,16 @@ class ContactsService {
     }
   }
 
-  static async removeContact(id) {
-    const contact = await Contact.findByIdAndDelete(id)
+  static async removeContact(_id, owner) {
+    const contact = await Contact.findOneAndDelete({ _id, owner })
     if (!contact) {
-      throw new BadRequestError(`Contact with id ${id} not found.`)
+      throw new BadRequestError(`Contact with id ${_id} not found.`)
     }
     return contact
   }
 
-  static async addContact(body) {
-    const contact = await Contact.create(body)
+  static async addContact(body, owner) {
+    const contact = await Contact.create({ ...body, owner })
     return contact
   }
 
@@ -54,13 +69,16 @@ class ContactsService {
     return contact
   }
 
-  static async updateContactStatus(id, body) {
+  static async updateContactStatus(_id, body, owner) {
     if (JSON.stringify(body) === '{}') {
       throw new BadRequestError('Missing fields favorite.')
     }
     const { favorite } = body
-    const contact = await Contact.findByIdAndUpdate(
-      id,
+    const contact = await Contact.findOneAndUpdate(
+      {
+        _id,
+        owner
+      },
       { favorite },
       { new: true })
     return contact
