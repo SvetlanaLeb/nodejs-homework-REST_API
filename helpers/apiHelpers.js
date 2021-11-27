@@ -1,4 +1,4 @@
-import { ValidationError, BadRequestError } from '../helpers/index.js'
+import { ServiceError } from '../helpers/index.js'
 
 const asyncWrapper = (controller) => {
   return (req, res, next) => {
@@ -7,8 +7,7 @@ const asyncWrapper = (controller) => {
 }
 
 const errorHandler = (err, req, res, next) => {
-  if (err instanceof ValidationError ||
-    err instanceof BadRequestError) {
+  if (err instanceof ServiceError) {
     return res.status(err.status).json({ message: err.message })
   }
   res.status(404).json({ message: err.message })

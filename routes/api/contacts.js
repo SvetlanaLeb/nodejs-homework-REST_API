@@ -1,6 +1,6 @@
 import express from 'express'
-import ContactsController from '../../controllers/contactController.js'
-import { vld } from '../../middlewares/index.js'
+import { ContactsController } from '../../controllers/index.js'
+import { vld, authMiddleware } from '../../middlewares/index.js'
 import { asyncWrapper } from '../../helpers/index.js'
 import {
   joiContactSchema,
@@ -13,6 +13,8 @@ const router = express.Router()
 const addPostValidation = vld(joiContactSchema)
 const patchPostValidation = vld(joiPatchedContactSchema)
 const updateStatusValidation = vld(joiFavoriteContactSchema)
+
+router.use(authMiddleware)
 
 router.get('/', asyncWrapper(ContactsController.listContactsCtrl))
 

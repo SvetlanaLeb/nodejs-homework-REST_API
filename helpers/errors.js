@@ -1,17 +1,37 @@
 import { HttpCodes } from '../constants.js'
 
-class ValidationError extends Error {
+class ServiceError extends Error {
   constructor(message) {
     super(message)
     this.status = HttpCodes.BAD_REQUEST
   }
 }
 
-class BadRequestError extends Error {
+class ValidationError extends ServiceError {
   constructor(message) {
     super(message)
     this.status = HttpCodes.BAD_REQUEST
   }
 }
 
-export { ValidationError, BadRequestError }
+class BadRequestError extends ServiceError {
+  constructor(message) {
+    super(message)
+    this.status = HttpCodes.BAD_REQUEST
+  }
+}
+class ConflictError extends ServiceError {
+  constructor(message) {
+    super(message)
+    this.status = HttpCodes.CONFLICT
+  }
+}
+
+class NotAuthorizedError extends ServiceError {
+  constructor(message) {
+    super(message)
+    this.status = HttpCodes.Unauthorized
+  }
+}
+
+export { ServiceError, ValidationError, BadRequestError, ConflictError, NotAuthorizedError }

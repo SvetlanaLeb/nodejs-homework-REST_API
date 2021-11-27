@@ -1,5 +1,5 @@
 import { asyncWrapper, errorHandler } from './apiHelpers.js'
-import { ValidationError, BadRequestError } from './errors.js'
+import { ServiceError, ValidationError, BadRequestError, ConflictError, NotAuthorizedError } from './errors.js'
 import colors from './colors.js'
 
-export { asyncWrapper, errorHandler, ValidationError, BadRequestError, colors }
+export { asyncWrapper, errorHandler, ServiceError, ValidationError, BadRequestError, ConflictError, NotAuthorizedError, colors }

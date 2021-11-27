@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Joi from 'joi'
+import mongoosePaginate from 'mongoose-paginate-v2'
 const { Schema } = mongoose
 
 const contactSchema = new Schema(
@@ -17,6 +18,10 @@ const contactSchema = new Schema(
     favorite: {
       type: Boolean,
       default: false,
+    },
+    owner: {
+      type: mongoose.ObjectId,
+      ref: 'user',
     },
   }, {
     versionKey: false,
@@ -37,6 +42,8 @@ const joiPatchedContactSchema = Joi.object({
 const joiFavoriteContactSchema = Joi.object({
   favorite: Joi.boolean().required()
 })
+
+contactSchema.plugin(mongoosePaginate)
 
 const Contact = mongoose.model('contact', contactSchema)
 
